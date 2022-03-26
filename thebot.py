@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import CallbackQuery, Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 
@@ -32,8 +32,8 @@ def main():
     
     sharingDOC_handler = MessageHandler(Filters.text & (~Filters.command), sharingDOC)
     dispatcher.add_handler(sharingDOC_handler)
-    #sharingVID_handler = MessageHandler(Filters.text & (~Filters.command), sharingVID)
-    #dispatcher.add_handler(sharingVID_handler)
+    sharingVID_handler = MessageHandler(telegram.ext.Filters.video & (~Filters.command), sharingVID)
+    dispatcher.add_handler(sharingVID_handler)
 
 
 
@@ -63,8 +63,16 @@ def sharingDOC(update, context):
     logging.info("context: " + str(context))
     context.bot.send_message(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
                              text=reply_message)
-
     update.message.reply_text('Thank you for sharing')
+
+def sharingVID(update, context):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    message = update.message
+    context.bot.send_video(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+                             video=message.video, caption=message.caption)
+    update.message.reply_text('Thank you for sharing')
+
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
