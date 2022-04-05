@@ -1,4 +1,4 @@
-from telegram import CallbackQuery, Update
+from telegram import CallbackQuery, Update, Voice
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 
@@ -34,6 +34,8 @@ def main():
     dispatcher.add_handler(sharingDOC_handler)
     sharingVID_handler = MessageHandler(telegram.ext.Filters.video & (~Filters.command), sharingVID)
     dispatcher.add_handler(sharingVID_handler)
+    sharingVoice_handler = MessageHandler(telegram.ext.Filters.voice & (~Filters.command), sharingVoice)
+    dispatcher.add_handler(sharingVoice_handler)
 
 
 
@@ -42,12 +44,14 @@ def main():
     #dispatcher.add_handler(CommandHandler("what", reply_instruction))
     #dispatcher.add_handler(CommandHandler("view", view_review))
     dispatcher.add_handler(CommandHandler("help", help_command))
-   
+    dispatcher.add_handler(CommandHandler("start", start_command))
     
 
     # To start the bot:
     updater.start_polling()
+    print('Started')
     updater.idle()
+    print('Stopping...')
 
 
 
@@ -73,11 +77,21 @@ def sharingVID(update, context):
                              video=message.video, caption=message.caption)
     update.message.reply_text('Thank you for sharing')
 
-
+def sharingVoice(update, context):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    message = update.message
+    context.bot.send_voice(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+                             voice=message.voice, caption=message.caption)
+    update.message.reply_text('Thank you for sharing')
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('E-mail Mike via wysy19982015@outlook.com')
+
+def start_command(update: Update, context: CallbackContext) -> None:
+    """Start you will get a link for pub channel"""
+    update.message.reply_text('Please add Channel https://t.me/Nur0Channel for more function')
 
 
 
