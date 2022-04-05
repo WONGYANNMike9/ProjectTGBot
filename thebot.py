@@ -36,7 +36,8 @@ def main():
     dispatcher.add_handler(sharingVID_handler)
     sharingVoice_handler = MessageHandler(telegram.ext.Filters.voice & (~Filters.command), sharingVoice)
     dispatcher.add_handler(sharingVoice_handler)
-
+    sharingPic_handler = MessageHandler(telegram.ext.Filters.photo & (~Filters.command), sharingPic)
+    dispatcher.add_handler(sharingPic_handler)
 
 
     # on different commands - answer in Telegram
@@ -83,6 +84,14 @@ def sharingVoice(update, context):
     message = update.message
     context.bot.send_voice(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
                              voice=message.voice, caption=message.caption)
+    update.message.reply_text('Thank you for sharing')
+
+def sharingPic(update, context):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    message = update.message
+    context.bot.send_photo(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+                             photo=message.photo[0], caption=message.caption)
     update.message.reply_text('Thank you for sharing')
 
 def help_command(update: Update, context: CallbackContext) -> None:
