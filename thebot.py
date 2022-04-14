@@ -1,9 +1,9 @@
+from tokenize import String
 from telegram import CallbackQuery, Update, Voice
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import configparser
 import os
 import logging
-import redis
 import telegram
 import telegram.ext
 import pymysql
@@ -18,7 +18,7 @@ def main():
     # Load your token and create an Updater for your Bot
     config = configparser.ConfigParser()
     config.read('config.ini')
-    updater = Updater(token=(config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
+    updater = Updater(token=(os.environ['ACCESS_TOKEN']), use_context=True)
     dispatcher = updater.dispatcher
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -56,12 +56,10 @@ def main():
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def sharingDOC(update, context):
-    config = configparser.ConfigParser()
-    config.read('config.ini')
     reply_message = update.message.text
     logging.info("Update: " + str(update))
     logging.info("context: " + str(context))
-    context.bot.send_message(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+    context.bot.send_message(chat_id=os.environ['Publish_Channel_ID'],
                              text=reply_message)
     update.message.reply_text('Thank you for sharing')
 
@@ -69,7 +67,7 @@ def sharingVID(update, context):
     config = configparser.ConfigParser()
     config.read('config.ini')
     message = update.message
-    context.bot.send_video(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+    context.bot.send_video(chat_id=os.environ['Publish_Channel_ID'],
                              video=message.video, caption=message.caption)
     update.message.reply_text('Thank you for sharing')
 
@@ -77,7 +75,7 @@ def sharingVoice(update, context):
     config = configparser.ConfigParser()
     config.read('config.ini')
     message = update.message
-    context.bot.send_voice(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+    context.bot.send_voice(chat_id=os.environ['Publish_Channel_ID'],
                              voice=message.voice, caption=message.caption)
     update.message.reply_text('Thank you for sharing')
 
@@ -85,7 +83,7 @@ def sharingPic(update, context):
     config = configparser.ConfigParser()
     config.read('config.ini')
     message = update.message
-    context.bot.send_photo(chat_id=config['TELEGRAM']['Publish_Channel_ID'],
+    context.bot.send_photo(chat_id=os.environ['Publish_Channel_ID'],
                              photo=message.photo[0], caption=message.caption)
     update.message.reply_text('Thank you for sharing')
 
@@ -102,8 +100,7 @@ def start_command(update: Update, context: CallbackContext) -> None:
 # insert comment information to the database
 def insert(w_username,w_id,w_comments,w_film):
     # Open database connection
-    db = pymysql.connect(host="mariadb4bot.mariadb.database.azure.com", port=3306, user="dbuser@mariadb4bot",
-                         password="Wy@190450", database="ccbot98")
+    db = pymysql.connect(String)
     # Use the cursor() method to create a cursor object cursor
     cursor = db.cursor()
     # Execute SQL query using execute() method
@@ -121,8 +118,7 @@ def insert(w_username,w_id,w_comments,w_film):
 # Output all comments for the specified movie name
 def read(filmname):
     # Open database connection
-    db = pymysql.connect(host="mariadb4bot.mariadb.database.azure.com", port=3306, user="dbuser@mariadb4bot",
-                         password="Wy@190450", database="ccbot98")
+    db = pymysql.connect(String)
     # Use the cursor() method to create a cursor object cursor
     cursor = db.cursor()
     # Execute SQL query using execute() method
